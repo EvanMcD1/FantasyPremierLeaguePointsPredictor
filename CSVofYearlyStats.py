@@ -242,16 +242,16 @@ class YearlyStats:
         df = pd.DataFrame(all_player_data)
 
         # Construct the output file path
-        file_output_path = (f'2022-23_player_points_per_minute_data.csv')
+        file_output_path = (f'2023-24_player_points_per_minute_data.csv')
 
         # Save the sorted DataFrame to a CSV file
         df.to_csv(file_output_path, index=False, mode='w')
 
 
 fpl_predictor = YearlyStats(
-            fixtures_file='Fantasy-Premier-League-master/data/2022-23/fixtures.csv',
-            player_id_file='Fantasy-Premier-League-master/data/2022-23/player_idlist.csv',
-            players_raw_file='Fantasy-Premier-League-master/data/2022-23/players_raw.csv',
-            folder_path='Fantasy-Premier-League-master/data/2022-23/gws'
+            fixtures_file='Fantasy-Premier-League-master/data/2023-24/fixtures.csv',
+            player_id_file='Fantasy-Premier-League-master/data/2023-24/player_idlist.csv',
+            players_raw_file='Fantasy-Premier-League-master/data/2023-24/players_raw.csv',
+            folder_path='Fantasy-Premier-League-master/data/2023-24/gws'
         )
 fpl_predictor.combine_gw_data(38)

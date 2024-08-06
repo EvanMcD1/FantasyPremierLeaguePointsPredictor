@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Read the CSV file
-csv_file = '/Users/evanmcdermid/PycharmProjects/FantasyPremierLeague/combined_gw1_data.csv'
+csv_file = '/Users/evanmcdermid/PycharmProjects/FantasyPremierLeague/24_25_combined_gw1_data.csv'
 data = pd.read_csv(csv_file)
 
 # Generate HTML table
@@ -38,7 +38,7 @@ html_content = f"""
 """
 
 # Save the HTML content to a file
-output_file = '/Users/evanmcdermid/PycharmProjects/FantasyPremierLeague/combined_gw1_data.html'
+output_file = '/Users/evanmcdermid/PycharmProjects/FantasyPremierLeague/index.html'
 with open(output_file, 'w') as file:
     file.write(html_content)
 
