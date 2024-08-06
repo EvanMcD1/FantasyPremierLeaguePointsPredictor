@@ -9,22 +9,28 @@ class FPLPredictor:
         self.player_id_file = player_id_file
         self.players_raw_file = players_raw_file
         self.folder_path = folder_path
+        self.team_id_to_name = self.load_team_mappings()
         self.gw_files = self.get_all_gw_files()
+        self.multipliers_df = self.load_multipliers_data()
+
 
     def load_xg_multipliers_data(self, gameweek):
-        multipliers_file = f'expected_goals_multipliers_gw{gameweek-1}.csv'
-        if os.path.exists(multipliers_file):
-            return pd.read_csv(multipliers_file)
-        else:
-            print(f"Multipliers file not found for Gameweek {gameweek-1}: {multipliers_file}")
-            return None
+        while True:
+            multipliers_file = f'expected_goals_multipliers_gw{gameweek-1}.csv'
+            if os.path.exists(multipliers_file):
+                return pd.read_csv(multipliers_file)
+            else:
+                gameweek-=1
+            if gameweek<=0:
+                return None
 
     def load_xa_multipliers_data(self, gameweek):
         multipliers_file = f'expected_assists_multipliers_gw{gameweek - 1}.csv'
         if os.path.exists(multipliers_file):
             return pd.read_csv(multipliers_file)
         else:
-            print(f"Multipliers file not found for Gameweek {gameweek - 1}: {multipliers_file}")
+            gameweek -= 1
+        if gameweek <= 0:
             return None
 
     def load_xgc_multipliers_data(self, gameweek):
@@ -32,8 +38,38 @@ class FPLPredictor:
         if os.path.exists(multipliers_file):
             return pd.read_csv(multipliers_file)
         else:
-            print(f"Multipliers file not found for Gameweek {gameweek - 1}: {multipliers_file}")
+            gameweek -= 1
+        if gameweek <= 0:
             return None
+
+    def load_multipliers_data(self):
+        multipliers_csv_path = '/Users/evanmcdermid/PycharmProjects/FantasyPremierLeague/home_away_points_multipliers_22-23.csv'
+        if os.path.exists(multipliers_csv_path):
+            return pd.read_csv(multipliers_csv_path)
+        else:
+            raise FileNotFoundError(f"Multipliers file not found: {multipliers_csv_path}")
+
+    def load_team_mappings(self):
+        teams_csv_path = '/Users/evanmcdermid/PycharmProjects/FantasyPremierLeague/Fantasy-Premier-League-master/data/2023-24/teams.csv'
+        teams_df = pd.read_csv(teams_csv_path)
+        return {row['id']: row['name'] for _, row in teams_df.iterrows()}
+
+    def get_team_multiplier(self,firstname,secondname,position,gameweek):
+        player_id = self.get_player_id(firstname, secondname)
+        if player_id is None:
+            return 1
+        team_code = self.get_team_code(player_id)
+        opponent_team_code, is_home = self.get_opponent_team_code(team_code, gameweek)
+        if opponent_team_code is None:
+            return 1
+        opponent_team_name=self.team_id_to_name.get(opponent_team_code)
+        position_column = f"{position}_Home_Multiplier" if is_home else f"{position}_Away_Multiplier"
+        team_row = self.multipliers_df[self.multipliers_df['Team'] == opponent_team_name]
+
+        if team_row.empty or position_column not in team_row.columns:
+            return 1.2
+
+        return team_row[position_column].values[0]
 
     def get_all_gw_files(self):
         gw_files = []
@@ -237,6 +273,25 @@ class FPLPredictor:
 
         return expected_assists_points
 
+    def minutes_per_start(self, player_name, consolidated_csv_path):
+        total_starts = 0
+        total_minutes = 0
+
+        # Load the consolidated data from the CSV file
+        data = pd.read_csv(consolidated_csv_path)
+        player_name_data=player_name.split()
+        player_id=self.get_player_id(player_name_data[0], ' '.join(player_name_data[1:]))
+
+        # Check if the necessary columns are present in the data
+        if {'player_id', 'avg_minutes_per_game'}.issubset(data.columns):
+            # Filter the data for the specific player
+            player_data = data[data['player_id'] == player_id]
+
+            return(data['avg_minutes_per_game'].values[0])
+
+        return 0
+
+
     def expected_points(self, firstname, secondname, gameweek, expectedminutes):
         player_id = self.get_player_id(firstname, secondname)
         if player_id is None:
@@ -315,7 +370,7 @@ class FPLPredictor:
         elif xP_permin>0 and gameweek<20:
             all_points = (non_minute_points * 3/4 + xP_permin * 1/4 * expectedminutes + minutes_points + cleansheet_points)
         else:
-            all_points=non_minute_points + minutes_points + cleansheet_points
+            all_points = non_minute_points + minutes_points + cleansheet_points
 
         return all_points
 
@@ -333,20 +388,31 @@ class FPLPredictor:
             player_name = row['name']
             position = row['position']
             total_points=row['total_points']
-            expected_minutes = row['minutes']
+            expected_minutes = row['starts']*self.minutes_per_start(player_name,'combined_player_avg_minutes_per_game.csv')
+            print(expected_minutes)
+            minutes = row['minutes']
+            value=row['value']/10
 
             names = player_name.split()
             first_name = names[0]
             last_name = ' '.join(names[1:])
 
             expected_points = self.expected_points(first_name, last_name, gameweek, expected_minutes)
+            ppmillion=expected_points/value
+            points_next_5=expected_points
+            for i in range(4):
+                points_next_5+=(self.expected_points(first_name, last_name, gameweek+1+i, expected_minutes))
 
             all_player_data.append({
                 'Name': player_name,
                 'Position': position,
+                'Minutes': minutes,
                 'Expected Minutes': expected_minutes,
                 'Total Points': total_points,
                 'Expected Points': expected_points,
+                'Value': value,
+                'Points Per Million': ppmillion,
+                'Points Next 5': points_next_5,
             })
 
         # Create a DataFrame from the collected player data
@@ -368,9 +434,6 @@ fpl_predictor = FPLPredictor(
             players_raw_file='Fantasy-Premier-League-master/data/2023-24/players_raw.csv',
             folder_path='Fantasy-Premier-League-master/data/2023-24/gws'
         )
-for gameweek in range(1, 38):
-    try:
-        fpl_predictor.combine_gw_data(gameweek)
-        print("done "+ str(gameweek))
-    except:
-        print("fail "+ str(gameweek))
+for gameweek in range(1, 39):
+    fpl_predictor.combine_gw_data(gameweek)
+    print("done "+ str(gameweek))
