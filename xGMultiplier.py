@@ -12,7 +12,7 @@ class MultiplierCalculator:
         self.previous_data = self.load_previous_data()
 
     def load_team_mappings(self):
-        teams_csv_path = os.path.join(self.folder_path, 'teams.csv')
+        teams_csv_path = os.path.join('/Users/evanmcdermid/PycharmProjects/FantasyPremierLeague/Fantasy-Premier-League-master/data/2024-25/teams.csv')
         if not os.path.exists(teams_csv_path):
             raise FileNotFoundError(f"Teams file not found: {teams_csv_path}")
         teams_df = pd.read_csv(teams_csv_path)
@@ -54,17 +54,19 @@ class MultiplierCalculator:
 
         home_avg_goals = {
             team: (
-                    (sum(goals) / len(goals)) * (self.gameweek / 38) + self.previous_data.at[
-                team, 'Multiplier_Home'] * ((38 - self.gameweek) / 38)
-            ) if goals else self.previous_data.at[team, 'Multiplier_Home'] if team in self.previous_data.index else 1
+                    (sum(goals) / len(goals)) * (self.gameweek / 38) +
+                    (self.previous_data.at[team, 'Multiplier_Home'] if team in self.previous_data.index else 1) * (
+                                (38 - self.gameweek) / 38)
+            ) if goals else (self.previous_data.at[team, 'Multiplier_Home'] if team in self.previous_data.index else 1)
             for team, goals in home_expected_goals.items()
         }
 
         away_avg_goals = {
             team: (
-                    (sum(goals) / len(goals)) * (self.gameweek / 38) + self.previous_data.at[
-                team, 'Multiplier_Away'] * ((38 - self.gameweek) / 38)
-            ) if goals else self.previous_data.at[team, 'Multiplier_Away'] if team in self.previous_data.index else 1
+                    (sum(goals) / len(goals)) * (self.gameweek / 38) +
+                    (self.previous_data.at[team, 'Multiplier_Away'] if team in self.previous_data.index else 1) * (
+                                (38 - self.gameweek) / 38)
+            ) if goals else (self.previous_data.at[team, 'Multiplier_Away'] if team in self.previous_data.index else 1)
             for team, goals in away_expected_goals.items()
         }
 

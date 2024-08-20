@@ -369,17 +369,14 @@ class FPLPredictor:
         all_player_data = []
 
         # Construct the file path for the specified gameweek
-        gw_file = os.path.join(self.folder_path, f'gw{gameweek}.csv')
-
-
-        # gw_data = pd.read_csv(gw_file)
-
+        gw_file = pd.read_csv(os.path.join(self.folder_path, f'gw{gameweek-1}.csv'))
 
         playerdata=pd.read_csv('/Users/evanmcdermid/PycharmProjects/FantasyPremierLeague/Fantasy-Premier-League-master/data/2024-25/cleaned_players.csv')
         for index, row in playerdata.iterrows():
             player_name = str(row['first_name'] + ' ' + row['second_name'])
             position = row['element_type']
-            expected_minutes = self.minutes_per_start(player_name,'combined_player_avg_minutes_per_game.csv')
+            start = int(gw_file.loc[gw_file['name'] == player_name, 'starts'].iloc[0])
+            expected_minutes = self.minutes_per_start(player_name,'combined_player_avg_minutes_per_game.csv')*start
             value = row['now_cost'] / 10
             first_name = row['first_name']
             last_name = row['second_name']
@@ -392,39 +389,12 @@ class FPLPredictor:
             all_player_data.append({
                 'Name': player_name,
                 'Position': position,
-                'Minutes Per Game Played': round(expected_minutes, 1),
+                'Expected Minutes': round(expected_minutes, 1),
                 'Expected Points': round(expected_points, 1),
                 'Value': round(value, 1),
                 'Points Per Million': round(ppmillion, 2),
                 'Points Next 5': round(points_next_5, 1),
             })
-
-
-        # for index, row in gw_data.iterrows():
-        #     player_name = row['name']
-        #     position = row['position']
-        #     expected_minutes = self.minutes_per_start(player_name,self.gw_files[:gameweek - 1])
-        #     value=row['value']/10
-        #
-        #     names = player_name.split()
-        #     first_name = names[0]
-        #     last_name = ' '.join(names[1:])
-        #
-        #     expected_points = self.expected_points(first_name, last_name, gameweek, expected_minutes)
-        #     ppmillion=expected_points/value
-        #     points_next_5=expected_points
-        #     for i in range(4):
-        #         points_next_5+=(self.expected_points(first_name, last_name, gameweek+1+i, expected_minutes))
-        #
-        #     all_player_data.append({
-        #         'Name': player_name,
-        #         'Position': position,
-        #         'Expected Minutes': expected_minutes,
-        #         'Expected Points': expected_points,
-        #         'Value': value,
-        #         'Points Per Million': ppmillion,
-        #         'Points Next 5': points_next_5,
-        #     })
 
         # Create a DataFrame from the collected player data
         df = pd.DataFrame(all_player_data)
@@ -443,8 +413,8 @@ fpl_predictor = FPLPredictor(
             fixtures_file='Fantasy-Premier-League-master/data/2024-25/fixtures.csv',
             player_id_file='Fantasy-Premier-League-master/data/2024-25/player_idlist.csv',
             players_raw_file='Fantasy-Premier-League-master/data/2024-25/players_raw.csv',
-            folder_path='Fantasy-Premier-League-master/data/2024-25'
+            folder_path='Fantasy-Premier-League-master/data/2024-25/gws'
         )
-for gameweek in range(1, 39):
+for gameweek in range(2, 39):
     fpl_predictor.combine_gw_data(gameweek)
     print("done "+ str(gameweek))

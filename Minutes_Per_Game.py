@@ -18,13 +18,14 @@ def calculate_average_minutes_per_game(gw_folders, output_csv_path):
                     # Extract player name
                     player_name = row['name']
                     minutes_played = row['minutes']
+                    starts = row['starts']
 
-                    if minutes_played > 0:
+                    if starts==1:
                         if player_name not in player_minutes_data:
                             player_minutes_data[player_name] = {'total_minutes': 0, 'games_played': 0}
 
                         player_minutes_data[player_name]['total_minutes'] += minutes_played
-                        player_minutes_data[player_name]['games_played'] += 1
+                        player_minutes_data[player_name]['games_played'] += starts
 
     # Calculate the average minutes per game for each player
     player_avg_minutes = []

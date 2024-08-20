@@ -51,19 +51,22 @@ class MultiplierCalculator:
 
         home_avg_goals_conceded = {
             team: (
-                    (sum(goals) / len(goals)) * (self.gameweek / 38) + self.previous_data.at[
-                team, 'Multiplier_Home'] * ((38 - self.gameweek) / 38)
-            ) if goals else self.previous_data.at[team, 'Multiplier_Home'] if team in self.previous_data.index else 1
+                    (sum(goals) / len(goals)) * (self.gameweek / 38) +
+                    (self.previous_data.at[team, 'Multiplier_Home'] if team in self.previous_data.index else 1) * (
+                                (38 - self.gameweek) / 38)
+            ) if goals else (self.previous_data.at[team, 'Multiplier_Home'] if team in self.previous_data.index else 1)
             for team, goals in home_goals_conceded.items()
         }
 
         away_avg_goals_conceded = {
             team: (
-                    (sum(goals) / len(goals)) * (self.gameweek / 38) + self.previous_data.at[
-                team, 'Multiplier_Away'] * ((38 - self.gameweek) / 38)
-            ) if goals else self.previous_data.at[team, 'Multiplier_Away'] if team in self.previous_data.index else 1
+                    (sum(goals) / len(goals)) * (self.gameweek / 38) +
+                    (self.previous_data.at[team, 'Multiplier_Away'] if team in self.previous_data.index else 1) * (
+                                (38 - self.gameweek) / 38)
+            ) if goals else (self.previous_data.at[team, 'Multiplier_Away'] if team in self.previous_data.index else 1)
             for team, goals in away_goals_conceded.items()
         }
+
         overall_home_avg_goals_conceded = sum(home_avg_goals_conceded.values()) / len(home_avg_goals_conceded) if home_avg_goals_conceded else 0
         overall_away_avg_goals_conceded = sum(away_avg_goals_conceded.values()) / len(away_avg_goals_conceded) if away_avg_goals_conceded else 0
 
