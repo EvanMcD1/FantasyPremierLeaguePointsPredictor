@@ -12,7 +12,7 @@ html_content = f"""
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Fantasy Premier League - GW1 Data</title>
+    <title>Fantasy Premier League - GW2 Data</title>
     <style>
         table {{
             width: 100%;
@@ -31,7 +31,7 @@ html_content = f"""
     </style>
 </head>
 <body>
-    <h1>Fantasy Premier League - GW1 Data</h1>
+    <h1>Fantasy Premier League - GW2 Data</h1>
     {html_table}
 </body>
 </html>
