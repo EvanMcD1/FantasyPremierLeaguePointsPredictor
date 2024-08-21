@@ -374,6 +374,9 @@ class FPLPredictor:
         playerdata=pd.read_csv('/Users/evanmcdermid/PycharmProjects/FantasyPremierLeague/Fantasy-Premier-League-master/data/2024-25/cleaned_players.csv')
         for index, row in playerdata.iterrows():
             player_name = str(row['first_name'] + ' ' + row['second_name'])
+            player_team=self.team_id_to_name.get(self.get_team_code(self.get_player_id(row['first_name'],row['second_name'])))
+            opponent_team_code, is_home=self.get_opponent_team_code(self.get_team_code(self.get_player_id(row['first_name'],row['second_name'])),gameweek)
+            opponent_team=self.team_id_to_name.get(opponent_team_code)
             position = row['element_type']
             start = int(gw_file.loc[gw_file['name'] == player_name, 'starts'].iloc[0])
             expected_minutes = self.minutes_per_start(player_name,'combined_player_avg_minutes_per_game.csv')*start
@@ -381,7 +384,6 @@ class FPLPredictor:
             first_name = row['first_name']
             last_name = row['second_name']
             expected_points = self.expected_points(first_name, last_name, gameweek, expected_minutes)
-            ppmillion = expected_points / value
             points_next_5 = expected_points
             for i in range(4):
                 points_next_5+=(self.expected_points(first_name, last_name, gameweek+1+i, expected_minutes))
@@ -389,10 +391,12 @@ class FPLPredictor:
             all_player_data.append({
                 'Name': player_name,
                 'Position': position,
+                'Team': player_team,
                 'Expected Minutes': round(expected_minutes, 1),
                 'Expected Points': round(expected_points, 1),
+                'Opponent Team':opponent_team,
+                'Home/Away': 'Home' if is_home else 'Away',
                 'Value': round(value, 1),
-                'Points Per Million': round(ppmillion, 2),
                 'Points Next 5': round(points_next_5, 1),
             })
 
