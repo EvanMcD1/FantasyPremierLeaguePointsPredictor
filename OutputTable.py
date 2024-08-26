@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Read the CSV file
-csv_file = '/Users/evanmcdermid/PycharmProjects/FantasyPremierLeague/24_25_combined_gw2_data.csv'
+csv_file = '/Users/evanmcdermid/PycharmProjects/FantasyPremierLeague/24_25_combined_gw3_data.csv'
 data = pd.read_csv(csv_file)
 
 # Generate HTML table
