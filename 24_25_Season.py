@@ -378,7 +378,11 @@ class FPLPredictor:
             opponent_team_code, is_home=self.get_opponent_team_code(self.get_team_code(self.get_player_id(row['first_name'],row['second_name'])),gameweek)
             opponent_team=self.team_id_to_name.get(opponent_team_code)
             position = row['element_type']
-            start = int(gw_file.loc[gw_file['name'] == player_name, 'starts'].iloc[0])
+            player_row = gw_file.loc[gw_file['name'] == player_name, 'starts']
+            if not player_row.empty:
+                start = int(player_row.iloc[0])
+            else:
+                start = 0  # or assign some default value
             expected_minutes = self.minutes_per_start(player_name,'combined_player_avg_minutes_per_game.csv')*start
             value = row['now_cost'] / 10
             first_name = row['first_name']
@@ -419,6 +423,6 @@ fpl_predictor = FPLPredictor(
             players_raw_file='Fantasy-Premier-League-master/data/2024-25/players_raw.csv',
             folder_path='Fantasy-Premier-League-master/data/2024-25/gws'
         )
-for gameweek in range(3, 39):
+for gameweek in range(4, 39):
     fpl_predictor.combine_gw_data(gameweek)
     print("done "+ str(gameweek))
