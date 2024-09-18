@@ -423,6 +423,6 @@ fpl_predictor = FPLPredictor(
             players_raw_file='Fantasy-Premier-League-master/data/2024-25/players_raw.csv',
             folder_path='Fantasy-Premier-League-master/data/2024-25/gws'
         )
-for gameweek in range(4, 39):
+for gameweek in range(5, 39):
     fpl_predictor.combine_gw_data(gameweek)
     print("done "+ str(gameweek))

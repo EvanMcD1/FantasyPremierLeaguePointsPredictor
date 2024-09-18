@@ -1,7 +1,7 @@
 import pandas as pd
 
 # Read the CSV file
-csv_file = '/Users/evanmcdermid/PycharmProjects/FantasyPremierLeague/24_25_combined_gw4_data.csv'
+csv_file = '/Users/evanmcdermid/PycharmProjects/FantasyPremierLeague/24_25_combined_gw5_data.csv'
 data = pd.read_csv(csv_file)
 
 # Generate HTML table
@@ -12,7 +12,7 @@ html_content = f"""
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Fantasy Premier League - GW4 Data</title>
+    <title>Fantasy Premier League - GW5 Data</title>
     <style>
         table {{
             width: 100%;
@@ -31,7 +31,7 @@ html_content = f"""
     </style>
 </head>
 <body>
-    <h1>Fantasy Premier League - GW4 Data</h1>
+    <h1>Fantasy Premier League - GW5 Data</h1>
     {html_table}
 </body>
 </html>
