@@ -3,7 +3,7 @@ from itertools import combinations
 from math import comb
 
 # Load the CSV data
-data = pd.read_csv('/Users/evanmcdermid/PycharmProjects/FantasyPremierLeague/24_25_combined_gw5_data.csv')
+data = pd.read_csv('/Users/evanmcdermid/PycharmProjects/FantasyPremierLeague/24_25_combined_gw6_data.csv')
 
 # Separate players by position
 players = {

@@ -356,9 +356,9 @@ class FPLPredictor:
         non_minute_points=(goals_points + assist_points + bonus_points + save_points + yellowcard_points + goals_conceded_points)
         if pd.isna(non_minute_points):
             all_points = (xP_permin * expectedminutes + minutes_points + cleansheet_points)
-        elif xP_permin>-1 and gameweek<10:
+        elif xP_permin>-1 and gameweek<5:
             all_points=(non_minute_points*(gameweek/38)+(xP_permin*((38-gameweek)/38))*expectedminutes + minutes_points + cleansheet_points)
-        elif xP_permin>0 and gameweek<20:
+        elif xP_permin>0 and gameweek<10:
             all_points = (non_minute_points * 3/4 + xP_permin * 1/4 * expectedminutes + minutes_points + cleansheet_points)
         else:
             all_points = non_minute_points + minutes_points + cleansheet_points
